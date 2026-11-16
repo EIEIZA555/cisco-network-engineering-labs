@@ -1,0 +1,55 @@
+! ==========================================================
+! ISP-ROUTER RUNNING CONFIGURATION (Lab 05 - External WAN)
+! ==========================================================
+hostname ISP-Router
+!
+interface GigabitEthernet0/0/0
+ description LINK_TO_CORP_ASA_OUTSIDE
+ ip address 203.0.113.1 255.255.255.252
+ no shutdown
+!
+interface GigabitEthernet0/0/1
+ description LINK_TO_PUBLIC_WEB_SERVER
+ ip address 198.51.100.1 255.255.255.0
+ no shutdown
+!
+end
+
+
+! ==========================================================
+! CORP-SWITCH RUNNING CONFIGURATION (Lab 05 - Inside LAN)
+! ==========================================================
+hostname Corp-Switch
+!
+vlan 10
+ name HR_Inside
+vlan 20
+ name Sales_Inside
+!
+! --- Dedicated Uplink Ports to ASA Physical Interfaces ---
+interface GigabitEthernet0/1
+ description UPLINK_TO_ASA_GIG1/7_HR
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+!
+interface GigabitEthernet0/2
+ description UPLINK_TO_ASA_GIG1/8_SALES
+ switchport mode access
+ switchport access vlan 20
+ spanning-tree portfast
+!
+! --- Workstation Access Ports ---
+interface range FastEthernet0/1 - 12
+ description HR_WORKSTATIONS
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+!
+interface range FastEthernet0/13 - 24
+ description SALES_WORKSTATIONS
+ switchport mode access
+ switchport access vlan 20
+ spanning-tree portfast
+!
+end
