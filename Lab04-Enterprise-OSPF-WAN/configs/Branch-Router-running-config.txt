@@ -1,0 +1,21 @@
+! ==========================================================
+! BRANCH-ROUTER RUNNING CONFIGURATION (Lab 04 - OSPF WAN)
+! ==========================================================
+hostname Branch-Router
+!
+interface GigabitEthernet0/0/0
+ description WAN_LINK_TO_HQ
+ ip address 10.0.0.2 255.255.255.252
+ no shutdown
+!
+interface GigabitEthernet0/0/1
+ description BRANCH_OFFICE_LAN
+ ip address 172.16.10.1 255.255.255.0
+ no shutdown
+!
+router ospf 1
+ router-id 2.2.2.2
+ network 10.0.0.0 0.0.0.3 area 0
+ network 172.16.10.0 0.0.0.255 area 0
+!
+end
