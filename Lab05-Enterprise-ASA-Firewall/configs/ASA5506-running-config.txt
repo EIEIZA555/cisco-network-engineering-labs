@@ -1,0 +1,74 @@
+! ==========================================================
+! CISCO ASA 5506-X RUNNING CONFIGURATION (Lab 05)
+! ==========================================================
+ASA Version 9.6(1)
+hostname ciscoasa
+!
+! --- 1. INTERFACE & SECURITY ZONE CONFIGURATION ---
+!
+interface GigabitEthernet1/1
+ nameif Outside
+ security-level 0
+ ip address 203.0.113.2 255.255.255.252
+ no shutdown
+!
+interface GigabitEthernet1/3
+ nameif DMZ
+ security-level 50
+ ip address 192.168.100.1 255.255.255.0
+ no shutdown
+!
+interface GigabitEthernet1/7
+ nameif inside_hr
+ security-level 100
+ ip address 10.10.10.1 255.255.255.0
+ no shutdown
+!
+interface GigabitEthernet1/8
+ nameif inside_sales
+ security-level 100
+ ip address 10.10.20.1 255.255.255.0
+ no shutdown
+!
+! --- 2. NETWORK OBJECTS & DYNAMIC PAT (NAT OVERLOAD) ---
+!
+object network OBJ_HR
+ subnet 10.10.10.0 255.255.255.0
+ nat (inside_hr,Outside) dynamic interface
+!
+object network OBJ_Sales
+ subnet 10.10.20.0 255.255.255.0
+ nat (inside_sales,Outside) dynamic interface
+!
+! --- 3. EXTENDED ACCESS CONTROL LISTS (SECURITY POLICY) ---
+!
+access-list SALES_POLICY extended deny icmp 10.10.20.0 255.255.255.0 host 192.168.100.100
+access-list SALES_POLICY extended permit ip 10.10.20.0 255.255.255.0 any
+!
+access-group SALES_POLICY in interface inside_sales
+!
+! --- 4. DEFAULT STATIC ROUTING TO ISP ---
+!
+route Outside 0.0.0.0 0.0.0.0 203.0.113.1 1
+!
+! --- 5. ASA DHCP SERVER CONFIGURATION (DHCPD) ---
+!
+dhcpd address 10.10.10.2-10.10.10.50 inside_hr
+dhcpd enable inside_hr
+!
+dhcpd address 10.10.20.2-10.10.20.50 inside_sales
+dhcpd enable inside_sales
+!
+! --- 6. MODULAR POLICY FRAMEWORK (STATEFUL INSPECTION) ---
+!
+class-map inspection_default
+ match default-inspection-traffic
+!
+policy-map global_policy
+ class inspection_default
+  inspect icmp
+  inspect http
+!
+service-policy global_policy global
+!
+end
