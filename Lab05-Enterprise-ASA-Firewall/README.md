@@ -45,7 +45,7 @@ The network is segmented into distinct security zones based on Cisco ASA Securit
 * **Case 3: End-to-End NAT & Stateful Return Verification**
   * *Challenge:* Verifying whether outbound web timeouts stemmed from NAT failure, ISP routing, or application inspection.
   * *Solution:* Used `show nat` and `show xlate` on the ASA to confirm active PAT translations (`translate_hits = 201, untranslate_hits = 142`), enabled `inspect http` in the global policy map, and resolved Packet Tracer URL parsing quirks.
-
+* **Special Case Simulation Note (DHCP on inside_hr): While dhcpd is configured and verified via show dhcpd state on the inside_hr interface, Cisco Packet Tracer's ASA simulation can exhibit inconsistent DHCP lease responses on certain zones. To proceed reliably with end-to-end validation, PC-Guest was assigned a static address within the 10.50.20.0/24 subnet (10.50.20.5/24, gateway 10.50.20.1), and all NAT, inspection, and ACL policies were verified (ICMP to 172.20.50.50 denied and reflected in ACL hit counts; HTTP access to both 172.20.50.50 and 8.8.4.10 permitted).
 ---
 
 ## ✅ Verification Summary
